@@ -1,0 +1,17 @@
+@model YourNamespace.Models.Teacher
+
+@{
+    ViewData["Title"] = "Teacher Details";
+}
+
+<h1>Teacher Details</h1>
+
+<div>
+    <h2>@Model.Name</h2>
+    <p>Hire Date: @Model.HireDate.ToShortDateString()</p>
+    <p>Salary: @Model.Salary</p>
+</div>
+
+<p>
+    <a href="/Teacher/List">Back to List</a>
+</p>

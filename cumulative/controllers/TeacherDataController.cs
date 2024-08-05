@@ -1,126 +1,116 @@
+using Cumulative1.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using YourNamespace.Models;
 using MySql.Data.MySqlClient;
 
-namespace YourNamespace.Controllers
+namespace Cumulative1.Controllers
 {
     public class TeacherDataController : ApiController
-    {
-        // The database context class which allows us to access our MySQL Database.
-        private SchoolDbContext _context = new SchoolDbContext();
+    {   
+        private SchoolDbContext School = new SchoolDbContext();
 
-        /// <summary>
-        /// Returns a list of teachers in the system.
-        /// </summary>
-        /// <example>GET api/TeacherData/ListTeachers</example>
-        /// <returns>A list of teachers</returns>
         [HttpGet]
-        [Route("api/TeacherData/ListTeachers")]
-        public IEnumerable<Teacher> ListTeachers()
+        public IEnumerable<Teacher> ListTeacher()
         {
-            // Create an instance of a connection
-            MySqlConnection conn = _context.AccessDatabase();
+            MySqlConnection Conn = School.AccessDatabase();
 
-            // Open the connection between the web server and database
-            conn.Open();
+            Conn.Open();
 
-            // Establish a new command (query) for our database
-            MySqlCommand cmd = conn.CreateCommand();
+            //Establish a new command (query) for our database
+            MySqlCommand cmd = Conn.CreateCommand();
 
-            // SQL QUERY
-            cmd.CommandText = "SELECT * FROM Teachers";
+            //SQL QUERY
+            cmd.CommandText = "Select * from teachers";
 
-            // Gather Result Set of Query into a variable
-            MySqlDataReader resultSet = cmd.ExecuteReader();
+            //Gather Result Set of Query into a variable
+            MySqlDataReader ResultSet = cmd.ExecuteReader();
 
-            // Create an empty list of teachers
-            List<Teacher> teachers = new List<Teacher>();
+            //Create an empty list of Authors
+            List<Teacher> Teachers = new List<Teacher> { };
 
-            // Loop Through Each Row of the Result Set
-            while (resultSet.Read())
+            //Loop Through Each Row the Result Set
+            while (ResultSet.Read())
             {
-                // Access Column information by the DB column name as an index
-                int teacherId = (int)resultSet["TeacherId"];
-                string name = resultSet["Name"].ToString();
-                DateTime hireDate = (DateTime)resultSet["HireDate"];
-                decimal salary = (decimal)resultSet["Salary"];
+                //Access Column information by the DB column name as an index
+                int Id = (int)ResultSet["teacherid"];
+                string TfName = ResultSet["teacherfname"].ToString();
+                string TlName = ResultSet["teacherlname"].ToString();
+                string Tnumber = ResultSet["employeenumber"].ToString();
+                DateTime Thiredate = Convert.ToDateTime(ResultSet["hiredate"]);
+                decimal Tsalary = Convert.ToDecimal(ResultSet["salary"]);
 
-                Teacher newTeacher = new Teacher
-                {
-                    TeacherId = teacherId,
-                    Name = name,
-                    HireDate = hireDate,
-                    Salary = salary
-                };
 
-                // Add the teacher to the list
-                teachers.Add(newTeacher);
+
+                Teacher NewTeacher = new Teacher();
+                NewTeacher.Id = Id;
+                NewTeacher.TfName = TfName;
+                NewTeacher.TlName = TlName;
+                NewTeacher.Tnumber = Tnumber;
+                NewTeacher.Thiredate = Thiredate;
+                NewTeacher.Tsalary = Tsalary;
+
+                //Add the Author Name to the List
+                Teachers.Add(NewTeacher);
             }
 
-            // Close the connection between the MySQL Database and the Web Server
-            conn.Close();
+            //Close the connection between the MySQL Database and the WebServer
+            Conn.Close();
 
-            // Return the final list of teachers
-            return teachers;
+            //Return the final list of author names
+            return Teachers;
         }
 
+
         /// <summary>
-        /// Finds a teacher in the system given an ID.
+        /// search details of a teacher by id 
         /// </summary>
-        /// <param name="id">The teacher primary key</param>
-        /// <returns>A teacher object</returns>
+      
         [HttpGet]
-        [Route("api/TeacherData/FindTeacher/{id}")]
-        public IHttpActionResult FindTeacher(int id)
+        public Teacher FindTeacher(int id)
         {
-            Teacher teacher = null;
+            Teacher NewTeacher = new Teacher();
 
-            // Create an instance of a connection
-            MySqlConnection conn = _context.AccessDatabase();
+            //Create an instance of a connection
+            MySqlConnection Conn = School.AccessDatabase();
 
-            // Open the connection between the web server and database
-            conn.Open();
+            //Open the connection between the web server and database
+            Conn.Open();
 
-            // Establish a new command (query) for our database
-            MySqlCommand cmd = conn.CreateCommand();
+            //Establish a new command (query) for our database
+            MySqlCommand cmd = Conn.CreateCommand();
 
-            // SQL QUERY
-            cmd.CommandText = "SELECT * FROM Teachers WHERE TeacherId = @id";
-            cmd.Parameters.AddWithValue("@id", id);
+            //SQL QUERY
+            cmd.CommandText = "Select * from teachers where teacherid = " + id;
 
-            // Gather Result Set of Query into a variable
-            MySqlDataReader resultSet = cmd.ExecuteReader();
+            //Gather Result Set of Query into a variable
+            MySqlDataReader ResultSet = cmd.ExecuteReader();
 
-            if (resultSet.Read())
+            while (ResultSet.Read())
             {
-                // Access Column information by the DB column name as an index
-                int teacherId = (int)resultSet["TeacherId"];
-                string name = resultSet["Name"].ToString();
-                DateTime hireDate = (DateTime)resultSet["HireDate"];
-                decimal salary = (decimal)resultSet["Salary"];
+                //Access Column information by the DB column name as an index
+                int Id = (int)ResultSet["teacherid"];
+                string TfName = ResultSet["teacherfname"].ToString();
+                string TlName = ResultSet["teacherlname"].ToString();
+                string Tnumber = ResultSet["employeeteacher"].ToString();
+                DateTime Thiredate = Convert.ToDateTime(ResultSet["hiredate"]);
+                decimal Tsalary = Convert.ToDecimal(ResultSet["salary"]);
 
-                teacher = new Teacher
-                {
-                    TeacherId = teacherId,
-                    Name = name,
-                    HireDate = hireDate,
-                    Salary = salary
-                };
+
+
+                NewTeacher.Id = Id;
+                NewTeacher.TfName = TfName;
+                NewTeacher.TlName = TlName;
+                NewTeacher.Tnumber = Tnumber;
+                NewTeacher.Thiredate = Thiredate;
+                NewTeacher.Tsalary = Tsalary;
             }
 
-            // Close the connection
-            conn.Close();
 
-            if (teacher == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(teacher);
+            return NewTeacher;
         }
     }
 }
